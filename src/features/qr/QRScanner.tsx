@@ -1,5 +1,5 @@
-import { Html5Qrcode } from "html5-qrcode";
-import { useRef, useState } from "react";
+import { Html5Qrcode, Html5QrcodeScannerState } from "html5-qrcode";
+import { useEffect, useRef, useState } from "react";
 import { decodeQR } from "./utils/qr.utils";
 
 interface Props {
@@ -8,87 +8,126 @@ interface Props {
 
 export default function QRScanner({ onSuccess }: Props) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const isRunningRef = useRef(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const isMountedRef = useRef(false);
+  const isStoppingRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const isDev = import.meta.env.DEV;
+  const hasRenderedOnce = useRef(false);
 
-  // 🔥 kill media track จริง ๆ
-  const forceStopCamera = () => {
+  const isMobileDevice = () =>
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const forceKillStream = () => {
     const videos = document.querySelectorAll("video");
     videos.forEach((video) => {
-      const stream = video.srcObject as MediaStream | null;
-      if (stream) {
+      if (video?.srcObject) {
+        const stream = video.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
         video.srcObject = null;
       }
     });
   };
 
+  const safeStop = async () => {
+    if (isStoppingRef.current) return;
+    isStoppingRef.current = true;
+
+    const scanner = scannerRef.current;
+
+    try {
+      if (scanner) {
+        const state = scanner.getState();
+
+        if (state === Html5QrcodeScannerState.SCANNING) {
+          await scanner.stop().catch(() => {});
+        }
+
+        await scanner.clear();
+      }
+
+      forceKillStream(); // 🔥 สำคัญ
+    } finally {
+      scannerRef.current = null;
+      isStoppingRef.current = false;
+    }
+  };
+
   const startScanner = async () => {
-    if (isRunningRef.current) return;
+    try {
+      setIsLoading(true);
 
-    setIsOpen(true); // ⭐ render div ก่อน
-
-    // รอให้ DOM update ก่อน
-    setTimeout(async () => {
       const scanner = new Html5Qrcode("reader");
       scannerRef.current = scanner;
 
-      try {
-        const devices = await Html5Qrcode.getCameras();
-        if (!devices?.length) throw new Error("No camera found");
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices?.length) throw new Error("No camera found");
 
-        await scanner.start(
-          devices[0].id,
-          { fps: 10 },
-          async (decodedText) => {
-            const parsed = decodeQR(decodedText);
-            if (!parsed?.userId) return;
+      await scanner.start(
+        isMobileDevice() ? { facingMode: "environment" } : devices[0].id,
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        async (decodedText) => {
+          if (!isMountedRef.current) return;
 
-            await stopScanner();
-            onSuccess(parsed.userId);
-          },
-          () => {},
-        );
+          const parsed = decodeQR(decodedText);
+          if (!parsed?.userId) return;
 
-        isRunningRef.current = true;
-      } catch (err) {
-        console.error("Camera start failed:", err);
+          await safeStop();
+          onSuccess(parsed.userId);
+        },
+        () => {},
+      );
+
+      if (isMountedRef.current) {
+        setIsLoading(false);
       }
-    }, 0);
-  };
-
-  const stopScanner = async () => {
-    if (!scannerRef.current) return;
-
-    try {
-      if (isRunningRef.current) {
-        await scannerRef.current.stop();
-        isRunningRef.current = false;
-      }
-
-      await scannerRef.current.clear();
-    } catch {
-      console.error("Camera stop failed");
+    } catch (err) {
+      console.error("Camera start failed:", err);
+      setIsLoading(false);
     }
-
-    forceStopCamera(); // 🔥 สำคัญ
-    setIsOpen(false);
   };
+
+  useEffect(() => {
+    if (isDev && !hasRenderedOnce.current) {
+      hasRenderedOnce.current = true;
+      return;
+    }
+    isMountedRef.current = true;
+
+    startScanner();
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        safeStop();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      isMountedRef.current = false;
+      safeStop();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
 
   return (
-    <div>
-      {!isOpen && <button onClick={startScanner}>เปิดกล้อง</button>}
+    <div className="qr-container">
+      <div className="qr-card">
+        <div className="qr-header">
+          <h2>Scan QR Code</h2>
+          <p>Align QR inside the frame</p>
+        </div>
 
-      {isOpen && <button onClick={stopScanner}>ปิดกล้อง</button>}
-
-      {/* ⭐ ต้อง render ตลอด */}
-      <div
-        id="reader"
-        style={{
-          width: 300,
-          marginTop: 10,
-        }}
-      />
+        <div className="qr-reader-wrapper">
+          {isLoading && (
+            <div className="qr-loading-overlay">
+              <div className="spinner" />
+              <span>Starting camera...</span>
+            </div>
+          )}
+          <div id="reader" className="qr-reader" />
+        </div>
+      </div>
     </div>
   );
 }
