@@ -5,6 +5,7 @@ import SignInPage from "@/features/auth/SignInPage";
 import SignUpPage from "@/features/auth/SignUpPage";
 import ChatPage from "@/features/chat/ChatPage";
 import ChatListPage from "@/features/chat/ChatListPage";
+import QRPage from "@/features/qr/QRPage";
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <ChatListPage /> },
           { path: "chat/:id", element: <ChatPage /> },
+          { path: "qr", element: <QRPage /> },
         ],
       },
     ],
