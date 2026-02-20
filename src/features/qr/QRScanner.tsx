@@ -1,5 +1,5 @@
 import { Html5Qrcode, Html5QrcodeScannerState } from "html5-qrcode";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { decodeQR } from "./utils/qr.utils";
 
 interface Props {
@@ -28,7 +28,7 @@ export default function QRScanner({ onSuccess }: Props) {
     });
   };
 
-  const safeStop = async () => {
+  const safeStop = useCallback(async () => {
     if (isStoppingRef.current) return;
     isStoppingRef.current = true;
 
@@ -50,9 +50,9 @@ export default function QRScanner({ onSuccess }: Props) {
       scannerRef.current = null;
       isStoppingRef.current = false;
     }
-  };
+  }, []);
 
-  const startScanner = async () => {
+  const startScanner = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -84,7 +84,7 @@ export default function QRScanner({ onSuccess }: Props) {
       console.error("Camera start failed:", err);
       setIsLoading(false);
     }
-  };
+  }, [safeStop, onSuccess]);
 
   useEffect(() => {
     if (isDev && !hasRenderedOnce.current) {
@@ -108,7 +108,7 @@ export default function QRScanner({ onSuccess }: Props) {
       safeStop();
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, []);
+  }, [isDev, startScanner, safeStop]);
 
   return (
     <div className="qr-container">
