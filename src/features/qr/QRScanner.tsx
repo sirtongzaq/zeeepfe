@@ -123,7 +123,6 @@ export default function QRScanner({ onSuccess, onLoadingChange }: Props) {
       <div className="qr-card">
         <div className="qr-header">
           <h2>Scan QR Code</h2>
-          <p>Align QR inside the frame</p>
         </div>
 
         <div className="qr-reader-wrapper">

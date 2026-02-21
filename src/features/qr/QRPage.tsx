@@ -21,10 +21,11 @@ export default function QRPage() {
   }, [chatUserId, navigate]);
 
   return (
-    <div className="app-container">
+    <div className="flex-1 flex flex-col h-full">
       <div className="qr-tabs">
         <button
           className={`qr-tab-btn ${activeTab === "myqr" ? "active" : ""} ${isLoading ? "disabled" : ""}`}
+          disabled={isLoading}
           onClick={() => setActiveTab("myqr")}
         >
           My QR
@@ -32,6 +33,7 @@ export default function QRPage() {
 
         <button
           className={`qr-tab-btn ${activeTab === "scan" ? "active" : ""} ${isLoading ? "disabled" : ""}`}
+          disabled={isLoading}
           onClick={() => setActiveTab("scan")}
         >
           Scan QR

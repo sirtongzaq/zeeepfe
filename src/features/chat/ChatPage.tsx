@@ -15,8 +15,14 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const handleBlur = () => {
+    window.requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    });
+  };
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({ behavior: "auto" });
   }, [messages]);
 
   const handleSend = () => {
@@ -62,6 +68,7 @@ export default function ChatPage() {
             placeholder="พิมพ์ข้อความ..."
             className="chat-input-field"
             value={input}
+            onBlur={handleBlur}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />

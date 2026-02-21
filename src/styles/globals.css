@@ -49,12 +49,6 @@
 /*        BASE APP STYLE         */
 /* ============================= */
 
-body {
-  background: var(--bg);
-  color: var(--text-primary);
-  font-feature-settings: "ss01";
-}
-
 /* Layout */
 .bg-app {
   background: var(--bg);
@@ -76,6 +70,79 @@ body {
   color: var(--text-secondary);
 }
 .text-muted {
+  color: var(--text-muted);
+}
+
+/* ============================= */
+/*         BASE TYPOGRAPHY       */
+/* ============================= */
+
+html {
+  font-size: 16px; /* 🔥 สำคัญมากสำหรับ mobile */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-feature-settings: "ss01";
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  overflow: hidden; /* 🔥 สำคัญ */
+}
+
+/* Headings */
+h1 {
+  font-size: 1.75rem; /* 28px */
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+}
+
+/* Paragraph */
+p {
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+}
+
+/* Small text */
+small {
+  font-size: 0.875rem; /* 14px */
+}
+
+/* Buttons */
+button {
+  font-size: 1rem; /* 16px */
+  font-weight: 500;
+}
+
+/* Inputs (🔥 กัน Safari Zoom) */
+input,
+textarea,
+select {
+  font-size: 1rem; /* 16px */
+}
+
+/* Placeholder */
+input::placeholder,
+textarea::placeholder {
   color: var(--text-muted);
 }
 
@@ -103,10 +170,15 @@ body {
 /* ============================= */
 /*            APP LAYOUT         */
 /* ============================= */
+html,
+body,
+#root {
+  height: 100%;
+}
 
 .app-shell {
   background: var(--bg-soft);
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
 }
@@ -114,7 +186,7 @@ body {
 .app-container {
   width: 100%;
   max-width: 420px;
-  height: 100%;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -122,7 +194,6 @@ body {
 }
 
 /* 🔥 iPad ขึ้นไปให้เต็มจอ */
-/* iPad only (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
   .app-shell {
     background: var(--surface);
@@ -255,7 +326,7 @@ body {
 
 /* Chat Header Text */
 .chat-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -372,10 +443,10 @@ body {
   max-width: 75%;
   padding: 12px 16px;
   border-radius: 20px;
-  font-size: 14px;
-  line-height: 1.4;
   word-break: break-word;
   animation: fadeIn 0.2s ease;
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
 }
 
 .chat-bubble.me {
@@ -428,7 +499,7 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .chat-info {
@@ -437,7 +508,7 @@ body {
 }
 
 .chat-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -474,7 +545,6 @@ body {
   position: sticky;
   bottom: 0;
   background: var(--surface);
-  /* border-top: 1px solid var(--border); */
   padding: 12px;
 }
 
@@ -492,7 +562,7 @@ body {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-primary);
 }
 
@@ -550,7 +620,7 @@ body {
 .qr-tab-btn {
   flex: 1;
   padding: 14px 0;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
@@ -666,7 +736,7 @@ body {
 /* Download button spacing */
 .qr-download-btn {
   padding: 10px 24px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* ============================= */
@@ -752,7 +822,7 @@ body {
 
 .qr-header p {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: 16px;
   color: #64748b;
 }
 

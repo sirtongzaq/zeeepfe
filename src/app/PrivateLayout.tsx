@@ -4,14 +4,16 @@ import BottomNav from "@/components/layout/BottomNav";
 
 export default function PrivateLayout() {
   const location = useLocation();
-
   const isChatPage = location.pathname.startsWith("/chat/");
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col flex-1 min-h-0">
       <Header isChatPage={isChatPage} />
-      <div className="flex-1 min-h-0">
+
+      <div className="flex-1 min-h-0 overflow-y-auto">
         <Outlet />
       </div>
+
       {!isChatPage && <BottomNav />}
     </div>
   );
