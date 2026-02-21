@@ -6,6 +6,7 @@ import QRScanner from "./QRScanner";
 export default function QRPage() {
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"myqr" | "scan">("myqr");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const currentUser = {
@@ -23,14 +24,14 @@ export default function QRPage() {
     <div className="app-container">
       <div className="qr-tabs">
         <button
-          className={`qr-tab-btn ${activeTab === "myqr" ? "active" : ""}`}
+          className={`qr-tab-btn ${activeTab === "myqr" ? "active" : ""} ${isLoading ? "disabled" : ""}`}
           onClick={() => setActiveTab("myqr")}
         >
           My QR
         </button>
 
         <button
-          className={`qr-tab-btn ${activeTab === "scan" ? "active" : ""}`}
+          className={`qr-tab-btn ${activeTab === "scan" ? "active" : ""} ${isLoading ? "disabled" : ""}`}
           onClick={() => setActiveTab("scan")}
         >
           Scan QR
@@ -46,7 +47,10 @@ export default function QRPage() {
 
         {activeTab === "scan" && (
           <div className="qr-scan-wrapper">
-            <QRScanner onSuccess={setChatUserId} />
+            <QRScanner
+              onSuccess={setChatUserId}
+              onLoadingChange={setIsLoading}
+            />
           </div>
         )}
       </div>

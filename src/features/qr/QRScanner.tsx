@@ -4,9 +4,10 @@ import { decodeQR } from "./utils/qr.utils";
 
 interface Props {
   onSuccess: (userId: string) => void;
+  onLoadingChange: (loading: boolean) => void;
 }
 
-export default function QRScanner({ onSuccess }: Props) {
+export default function QRScanner({ onSuccess, onLoadingChange }: Props) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const isMountedRef = useRef(false);
   const isStoppingRef = useRef(false);
@@ -55,6 +56,7 @@ export default function QRScanner({ onSuccess }: Props) {
   const startScanner = useCallback(async () => {
     try {
       setIsLoading(true);
+      onLoadingChange(true);
 
       const scanner = new Html5Qrcode("reader");
       scannerRef.current = scanner;
@@ -78,13 +80,19 @@ export default function QRScanner({ onSuccess }: Props) {
       );
 
       if (isMountedRef.current) {
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+          onLoadingChange(false);
+        }, 1000);
       }
     } catch (err) {
       console.error("Camera start failed:", err);
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+        onLoadingChange(false);
+      }, 1000);
     }
-  }, [safeStop, onSuccess]);
+  }, [safeStop, onSuccess, onLoadingChange]);
 
   useEffect(() => {
     if (isDev && !hasRenderedOnce.current) {
