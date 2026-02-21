@@ -25,6 +25,26 @@
   /* Chat */
   --bubble-me: #3b82f6;
   --bubble-other: #f3f4f6;
+
+  /* Success */
+  --success: #22c55e;
+  --success-bg: #dcfce7;
+  --success-border: #86efac;
+
+  /* Error */
+  --error: #ef4444;
+  --error-bg: #fee2e2;
+  --error-border: #fca5a5;
+
+  /* Warning */
+  --warning: #f59e0b;
+  --warning-bg: #fef3c7;
+  --warning-border: #fcd34d;
+
+  /* Info */
+  --info: #3b82f6;
+  --info-bg: #dbeafe;
+  --info-border: #93c5fd;
 }
 
 /* ============================= */
@@ -43,6 +63,26 @@
 
   --bubble-me: #3b82f6;
   --bubble-other: #273449;
+
+  /* Success */
+  --success: #4ade80;
+  --success-bg: #052e16;
+  --success-border: #166534;
+
+  /* Error */
+  --error: #f87171;
+  --error-bg: #3f1d1d;
+  --error-border: #7f1d1d;
+
+  /* Warning */
+  --warning: #fbbf24;
+  --warning-bg: #3a2e0b;
+  --warning-border: #78350f;
+
+  /* Info */
+  --info: #60a5fa;
+  --info-bg: #172554;
+  --info-border: #1e3a8a;
 }
 
 /* ============================= */
@@ -866,4 +906,39 @@ body,
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ============================= */
+/*             ALERT             */
+/* ============================= */
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 16px;
+  /* font-size: 14px; */
+  border: 1px solid;
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success-border);
+}
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error);
+  border-color: var(--error-border);
+}
+
+.alert-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+
+.alert-info {
+  background: var(--info-bg);
+  color: var(--info);
+  border-color: var(--info-border);
 }

@@ -14,20 +14,24 @@ export default function QRScanner({ onSuccess, onLoadingChange }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const isDev = import.meta.env.DEV;
   const hasRenderedOnce = useRef(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isMobileDevice = () =>
     /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  const forceKillStream = () => {
+  const forceKillStream = useCallback(async () => {
     const videos = document.querySelectorAll("video");
     videos.forEach((video) => {
       if (video?.srcObject) {
         const stream = video.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
         video.srcObject = null;
+        setError("กล้องถูกปิดหรือหยุดทำงาน");
+        setIsLoading(false);
+        onLoadingChange(false);
       }
     });
-  };
+  }, [onLoadingChange]);
 
   const safeStop = useCallback(async () => {
     if (isStoppingRef.current) return;
@@ -51,7 +55,7 @@ export default function QRScanner({ onSuccess, onLoadingChange }: Props) {
       scannerRef.current = null;
       isStoppingRef.current = false;
     }
-  }, []);
+  }, [forceKillStream]);
 
   const startScanner = useCallback(async () => {
     try {
@@ -106,6 +110,7 @@ export default function QRScanner({ onSuccess, onLoadingChange }: Props) {
     const handleVisibility = () => {
       if (document.hidden) {
         safeStop();
+        setError("กล้องถูกหยุดเนื่องจากออกจากแอป");
       }
     };
 
@@ -133,6 +138,7 @@ export default function QRScanner({ onSuccess, onLoadingChange }: Props) {
             </div>
           )}
           <div id="reader" className="qr-reader" />
+          {error && <div className="alert alert-error">{error}</div>}
         </div>
       </div>
     </div>

@@ -14,8 +14,10 @@ export default function ChatPage() {
 
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   const handleBlur = () => {
+    if (!isMobile()) return;
     window.requestAnimationFrame(() => {
       bottomRef.current?.scrollIntoView({ behavior: "auto" });
     });
