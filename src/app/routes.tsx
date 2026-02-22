@@ -2,10 +2,11 @@ import { createBrowserRouter } from "react-router-dom";
 import AppLayout from "./AppLayout";
 import PrivateLayout from "./PrivateLayout";
 import SignInPage from "@/features/auth/SignInPage";
-import SignUpPage from "@/features/auth/SignUpPage";
 import ChatPage from "@/features/chat/ChatPage";
 import ChatListPage from "@/features/chat/ChatListPage";
 import QRPage from "@/features/qr/QRPage";
+import OtpPage from "@/features/auth/OtpPage";
+import ProfilePage from "@/features/profile/ProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -14,8 +15,7 @@ export const router = createBrowserRouter([
     children: [
       // Public routes
       { path: "signin", element: <SignInPage /> },
-      { path: "signup", element: <SignUpPage /> },
-
+      { path: "otp", element: <OtpPage /> },
       // Private routes
       {
         element: <PrivateLayout />,
@@ -23,6 +23,7 @@ export const router = createBrowserRouter([
           { index: true, element: <ChatListPage /> },
           { path: "chat/:id", element: <ChatPage /> },
           { path: "qr", element: <QRPage /> },
+          { path: "/profile", element: <ProfilePage /> },
         ],
       },
     ],
