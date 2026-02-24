@@ -1,146 +1,65 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { chatApi } from "@/features/chat/api";
+import type { ChatRoom } from "./types/chat.types";
+import { loadName } from "./utils/chat.utils";
 
 export default function ChatListPage() {
-  const mockChats = [
-    {
-      id: 1,
-      name: "John Doe",
-      lastMessage: "ไปกินข้าวกันไหม",
-      time: "10:24",
-      unread: 2,
-      type: "user",
-    },
-    {
-      id: 2,
-      name: "Dev Team",
-      lastMessage: "Deploy production แล้ว 🚀",
-      time: "09:50",
-      unread: 0,
-      type: "group",
-    },
-    {
-      id: 3,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 14,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 4,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 5,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 6,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 7,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 8,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 9,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 10,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 11,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 12,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
-    {
-      id: 13,
-      name: "Jane Smith",
-      lastMessage: "โอเค เดี๋ยวส่งให้",
-      time: "เมื่อวาน",
-      unread: 1,
-      type: "user",
-    },
+  const [rooms, setRooms] = useState<ChatRoom[]>([]);
 
-  ];
+  useEffect(() => {
+    async function loadRooms() {
+      const res = await chatApi.getMyRooms();
+      setRooms(res.data.data);
+      console.log("📦 Loaded chat rooms", res.data.data);
+    }
+
+    loadRooms();
+  }, []);
 
   return (
     <div className="flex-1 overflow-y-auto chat-list-container">
-      {mockChats.map((chat) => (
-        <Link key={chat.id} to={`/chat/${chat.id}`} className="chat-list-item">
-          {/* Avatar */}
-          <div className="chat-avatar">
-            {chat.name.slice(0, 2).toUpperCase()}
-          </div>
+      {rooms && rooms.length > 0 ? (
+        rooms.map((room) => (
+          <Link
+            key={room.id}
+            to={`/chat/${room.id}`}
+            className="chat-list-item"
+          >
+            {/* Avatar */}
+            <div className="chat-avatar">{loadName(room, true)}</div>
 
-          {/* Info */}
-          <div className="chat-info">
-            <div className="chat-name">{chat.name}</div>
-            <div className="chat-last">{chat.lastMessage}</div>
-          </div>
+            {/* Info */}
+            <div className="chat-info">
+              <div className="chat-name">{loadName(room)}</div>
+              <div className="chat-last">
+                {room.lastMessage?.content || "No messages yet"}
+              </div>
+            </div>
 
-          {/* Meta */}
-          <div className="chat-meta">
-            <div>{chat.time}</div>
-            {chat.unread > 0 && (
-              <div className="chat-unread">{chat.unread}</div>
-            )}
-          </div>
-        </Link>
-      ))}
+            {/* Meta */}
+            <div className="chat-meta">
+              <div>
+                {room.lastMessage?.createdAt
+                  ? new Date(room.lastMessage.createdAt).toLocaleTimeString(
+                      [],
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      },
+                    )
+                  : ""}
+              </div>
+
+              {room.unreadCount && room.unreadCount > 0 && (
+                <div className="chat-unread">{room.unreadCount}</div>
+              )}
+            </div>
+          </Link>
+        ))
+      ) : (
+        <div className="p-4 text-center text-gray-400">No rooms</div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,12 @@
 import axios from "axios";
-import { ENV } from "../config/env";
+import { ENV } from "@/shared/config/env";
 import { useAuthStore } from "@/features/auth/authStore";
 
+const API_PREFIX = import.meta.env.VITE_API_PREFIX || "/api";
+const baseUrl = ENV.API_URL?.replace(/\/$/, "") || "";
+
 export const api = axios.create({
-  baseURL: ENV.API_URL,
+  baseURL: `${baseUrl}${API_PREFIX}`,
   withCredentials: true,
 });
 

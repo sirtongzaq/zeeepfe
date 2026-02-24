@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
         element: <PrivateLayout />,
         children: [
           { index: true, element: <ChatListPage /> },
-          { path: "chat/:id", element: <ChatPage /> },
+          { path: "chat/:chatRoomId", element: <ChatPage /> },
           { path: "qr", element: <QRPage /> },
           { path: "/profile", element: <ProfilePage /> },
         ],

@@ -14,5 +14,19 @@ export default defineConfig({
   },
   server: {
     host: true,
+    port: 5173,
+    proxy: {
+      "/api": {
+        target: "http://192.168.1.6:3000",
+        changeOrigin: false,
+        secure: false,
+        ws: true,
+      },
+      "/socket.io": {
+        target: "http://192.168.1.6:3000",
+        ws: true,
+        changeOrigin: true,
+      },
+    },
   },
 });
