@@ -7,8 +7,7 @@ import logoLight from "@/assets/logo_light_lg.png";
 import logoDark from "@/assets/logo_dark_lg.png";
 import LogOutBtn from "../logout/LogOutBtn";
 import type { ChatRoomDetail } from "@/features/chat/types/chat.types";
-import { useAuthStore } from "@/features/auth/authStore";
-import { decodeToken } from "@/features/auth/jwt";
+import { useAuthStore } from "@/stores/authStore";
 import { loadNameHeader } from "@/features/chat/utils/chat.utils";
 
 type Props = {
@@ -21,16 +20,14 @@ export default function Header({ isChatPage, chatDetail }: Props) {
   const { theme } = useTheme();
   const token = useAuthStore((s) => s.accessToken);
   const isReady = Boolean(chatDetail && token);
+  const currentUser = useAuthStore((s) => s.user);
 
   const headerUser = useMemo(() => {
     if (!isReady) return undefined;
 
-    const payload = decodeToken(token!);
-    const currentUserId = payload.sub;
-
-    return chatDetail!.participants.find((p) => p.userId !== currentUserId)
+    return chatDetail!.participants.find((p) => p.userId !== currentUser!.id)
       ?.user;
-  }, [chatDetail, token, isReady]);
+  }, [isReady, chatDetail, currentUser]);
 
   if (!isChatPage) {
     return (

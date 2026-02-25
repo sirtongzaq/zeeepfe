@@ -5,8 +5,12 @@ import type { ChatMessage, ChatRoom } from "./types/chat.types";
 export const chatApi = {
   getMyRooms: () => api.get<ApiResponse<ChatRoom[]>>("/chat/rooms"),
 
-  getMessages: (chatRoomId: string) =>
-    api.get<ApiResponse<ChatMessage>>(`/chat/rooms/${chatRoomId}/messages`),
+  getMessages: (chatRoomId: string, cursor?: string | null) =>
+    api.get<ApiResponse<ChatMessage>>(`/chat/rooms/${chatRoomId}/messages`, {
+      params: {
+        cursor: cursor ?? undefined,
+      },
+    }),
 
   getOrCreatePrivateRoom: (friendId: string) =>
     api.post<ApiResponse<{ id: string }>>("/chat/rooms/private", {

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ENV } from "@/shared/config/env";
-import { useAuthStore } from "@/features/auth/authStore";
+import { useAuthStore } from "@/stores/authStore";
 
 const API_PREFIX = import.meta.env.VITE_API_PREFIX || "/api";
 const baseUrl = ENV.API_URL?.replace(/\/$/, "") || "";

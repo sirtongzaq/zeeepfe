@@ -1,4 +1,4 @@
-import { useAuthStore } from "./authStore";
+import { useAuthStore } from "@/stores/authStore";
 
 let logoutTimer: ReturnType<typeof setTimeout> | null = null;
 

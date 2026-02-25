@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/features/auth/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { LogOutIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

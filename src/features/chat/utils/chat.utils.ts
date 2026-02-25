@@ -1,11 +1,25 @@
 import type { ChatRoom, Sender } from "../types/chat.types";
 
+//////////////////////////////////////////////////
+// CHAT LIST NAME (1-1 + GROUP)
+//////////////////////////////////////////////////
+
 export function loadName(room: ChatRoom, isAvatar = false) {
-  const text =
-    room.name ??
-    room.lastMessage?.sender?.nickname ??
-    room.lastMessage?.sender?.email ??
-    "";
+  let text = "";
+
+  ////////////////////////////////////////////
+  // 🔥 Group Chat
+  ////////////////////////////////////////////
+  if (room.isGroup) {
+    text = room.name ?? "Unnamed Group";
+  }
+
+  ////////////////////////////////////////////
+  // 🔥 1-1 Chat
+  ////////////////////////////////////////////
+  else {
+    text = room.otherUser?.nickname ?? room.otherUser?.email ?? "";
+  }
 
   const safeText = text.trim();
 
@@ -21,6 +35,10 @@ export function loadName(room: ChatRoom, isAvatar = false) {
 
   return safeText.slice(0, 2).toUpperCase();
 }
+
+//////////////////////////////////////////////////
+// HEADER NAME
+//////////////////////////////////////////////////
 
 export function loadNameHeader(sender: Sender, isAvatar = false) {
   const text = sender.nickname ?? sender.email ?? "";

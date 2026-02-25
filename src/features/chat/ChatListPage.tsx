@@ -1,65 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { chatApi } from "@/features/chat/api";
-import type { ChatRoom } from "./types/chat.types";
+import { useChatStore } from "@/stores/chatStore";
 import { loadName } from "./utils/chat.utils";
 
 export default function ChatListPage() {
-  const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const rooms = useChatStore((s) => s.rooms);
+  const setRooms = useChatStore((s) => s.setRooms);
+
+  ////////////////////////////////////////////////
+  // Initial Load (ครั้งเดียวพอ)
+  ////////////////////////////////////////////////
 
   useEffect(() => {
-    async function loadRooms() {
+    const load = async () => {
       const res = await chatApi.getMyRooms();
-      setRooms(res.data.data);
-      console.log("📦 Loaded chat rooms", res.data.data);
-    }
+      const filtered = res.data.data.filter((r) => r.lastMessage);
+      setRooms(filtered);
+    };
 
-    loadRooms();
-  }, []);
+    load();
+  }, [setRooms]);
+
+  ////////////////////////////////////////////////
+  // UI
+  ////////////////////////////////////////////////
+
+  if (!rooms.length) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted">No rooms</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-y-auto chat-list-container">
-      {rooms && rooms.length > 0 ? (
-        rooms.map((room) => (
-          <Link
-            key={room.id}
-            to={`/chat/${room.id}`}
-            className="chat-list-item"
-          >
-            {/* Avatar */}
-            <div className="chat-avatar">{loadName(room, true)}</div>
+      {rooms.map((room) => (
+        <Link key={room.id} to={`/chat/${room.id}`} className="chat-list-item">
+          <div className="chat-avatar">{loadName(room, true)}</div>
 
-            {/* Info */}
-            <div className="chat-info">
-              <div className="chat-name">{loadName(room)}</div>
-              <div className="chat-last">
-                {room.lastMessage?.content || "No messages yet"}
-              </div>
+          <div className="chat-info">
+            <div className="chat-name">{loadName(room)}</div>
+            <div className="chat-last">{room.lastMessage?.content}</div>
+          </div>
+
+          <div className="chat-meta">
+            <div>
+              {room.lastMessage?.createdAt
+                ? new Date(room.lastMessage.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : ""}
             </div>
 
-            {/* Meta */}
-            <div className="chat-meta">
-              <div>
-                {room.lastMessage?.createdAt
-                  ? new Date(room.lastMessage.createdAt).toLocaleTimeString(
-                      [],
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      },
-                    )
-                  : ""}
-              </div>
-
-              {room.unreadCount && room.unreadCount > 0 && (
-                <div className="chat-unread">{room.unreadCount}</div>
-              )}
-            </div>
-          </Link>
-        ))
-      ) : (
-        <div className="p-4 text-center text-gray-400">No rooms</div>
-      )}
+            {room.unreadCount && room.unreadCount > 0 && (
+              <div className="chat-unread">{room.unreadCount}</div>
+            )}
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap");
 
 /* ============================= */
 /*         BLUE MINIMAL          */
@@ -49,6 +48,9 @@
   --info: #3b82f6;
   --info-bg: #dbeafe;
   --info-border: #93c5fd;
+
+  /* QR */
+  --qr-border: #f9fafb;
 }
 
 /* ============================= */
@@ -87,6 +89,9 @@
   --info: #60a5fa;
   --info-bg: #172554;
   --info-border: #1e3a8a;
+
+    /* QR */
+  --qr-border: #f9fafb;
 }
 
 /* ============================= */
@@ -784,18 +789,6 @@ body,
   gap: 24px;
 }
 
-/* Card */
-/* .qr-card {
-  background: var(--surface);
-  padding: 28px;
-  border-radius: 28px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  transition:
-    background 0.3s ease,
-    box-shadow 0.3s ease;
-} */
-
 /* Dark mode shadow softer */
 [data-theme="dark"] .qr-card {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -827,6 +820,7 @@ body,
 /* ============================= */
 
 .qr-glow {
+  border: 2px solid var(--qr-border);
   border-radius: 16px;
   animation: qrPulse 3s infinite ease-in-out;
 }

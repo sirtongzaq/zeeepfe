@@ -3,21 +3,14 @@ import { useNavigate } from "react-router-dom";
 import QRMyProfile from "./QRMyProfile";
 import QRScanner from "./QRScanner";
 import { chatApi } from "../chat/api";
-import { useAuthStore } from "../auth/authStore";
-import { decodeToken } from "../auth/jwt";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function QRPage() {
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"myqr" | "scan">("myqr");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const token = useAuthStore((s) => s.accessToken);
-  const payload = decodeToken(token || "fake token");
-
-  const currentUser = {
-    id: "1",
-    name: "Narongrit",
-  };
+  const currentUser = useAuthStore((s) => s.user);
 
   const handleScanSuccess = useCallback(
     async (targetUserId: string) => {
@@ -64,12 +57,20 @@ export default function QRPage() {
         >
           Scan QR
         </button>
+
+        {/* <button
+          className={`qr-tab-btn ${activeTab === "scan" ? "active" : ""} ${isLoading ? "disabled" : ""}`}
+          disabled={isLoading}
+          onClick={() => setActiveTab("addfriend")}
+        >
+          Add Friend
+        </button> */}
       </div>
 
       <div className="qr-content">
         {activeTab === "myqr" && (
           <div className="qr-my-wrapper">
-            <QRMyProfile userId={payload.sub} name={currentUser.name} />
+            <QRMyProfile userId={currentUser!.id} name={currentUser!.id} />
           </div>
         )}
 
