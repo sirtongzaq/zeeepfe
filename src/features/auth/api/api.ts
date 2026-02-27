@@ -1,6 +1,6 @@
 import { api } from "@/shared/lib/axios";
 import type { ApiResponse } from "@/shared/types/api.types";
-import type { RequestOtpResponse, VerifyOtpResponse } from "./types/auth.types";
+import type { RequestOtpResponse, VerifyOtpResponse } from "../types/auth.types";
 
 export const authApi = {
   requestOtp: (email: string) =>

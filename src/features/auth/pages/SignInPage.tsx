@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "./api";
-import AuthLayout from "./AuthLayout";
+import { authApi } from "../api/api";
+import AuthLayout from "@/app/layouts/AuthLayout";
 
 export default function SignInPage() {
   const navigate = useNavigate();

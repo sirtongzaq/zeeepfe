@@ -5,7 +5,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 import type { ChatRoomDetail } from "@/features/chat/types/chat.types";
-import { SocketManager } from "./SocketManager";
+import { SocketProvider } from "../providers/SocketProvider";
+import ChatProvider from "../providers/ChatProvider";
 
 function isTokenExpired(token: string) {
   const { exp } = jwtDecode<{ exp: number }>(token);
@@ -25,7 +26,8 @@ export default function PrivateLayout() {
 
   return (
     <>
-      <SocketManager />
+      <SocketProvider />
+      <ChatProvider />
       <div className="flex flex-col flex-1 min-h-0">
         <Header isChatPage={isChatPage} chatDetail={chatDetail} />
         <div className="flex-1 min-h-0 overflow-y-auto">

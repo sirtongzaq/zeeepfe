@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { authApi } from "./api";
-import AuthLayout from "./AuthLayout";
-import { scheduleLogout } from "./authService";
 import { useAuthStore } from "@/stores/authStore";
 import { useLocation, useNavigate } from "react-router-dom";
+import { authApi } from "../api/api";
+import AuthLayout from "@/app/layouts/AuthLayout";
+import { scheduleLogout } from "../services/authService";
 
 export default function OtpPage() {
   const location = useLocation();

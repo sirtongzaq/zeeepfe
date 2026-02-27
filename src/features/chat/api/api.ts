@@ -1,6 +1,6 @@
 import { api } from "@/shared/lib/axios";
 import type { ApiResponse } from "@/shared/types/api.types";
-import type { ChatMessage, ChatRoom } from "./types/chat.types";
+import type { ChatMessage, ChatRoom } from "../types/chat.types";
 
 export const chatApi = {
   getMyRooms: () => api.get<ApiResponse<ChatRoom[]>>("/chat/rooms"),

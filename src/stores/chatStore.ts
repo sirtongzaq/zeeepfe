@@ -30,6 +30,7 @@ export const useChatStore = create<ChatState>((set) => ({
           ? {
               ...room,
               lastMessage: data.lastMessage,
+              lastMessageAt: data.lastMessageAt,
               unreadCount:
                 data.senderId === myUserId
                   ? (room.unreadCount ?? 0)
@@ -37,6 +38,14 @@ export const useChatStore = create<ChatState>((set) => ({
             }
           : room,
       );
+
+      // 🔥 reorder ห้องตาม lastMessageAt
+      updated.sort((a, b) => {
+        const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+        const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+
+        return bTime - aTime;
+      });
 
       return {
         rooms: updated,

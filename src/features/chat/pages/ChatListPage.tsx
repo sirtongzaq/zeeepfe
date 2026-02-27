@@ -1,26 +1,9 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { chatApi } from "@/features/chat/api";
 import { useChatStore } from "@/stores/chatStore";
-import { loadName } from "./utils/chat.utils";
+import { loadName } from "../utils/chat.utils";
 
 export default function ChatListPage() {
   const rooms = useChatStore((s) => s.rooms);
-  const setRooms = useChatStore((s) => s.setRooms);
-
-  ////////////////////////////////////////////////
-  // Initial Load (ครั้งเดียวพอ)
-  ////////////////////////////////////////////////
-
-  useEffect(() => {
-    const load = async () => {
-      const res = await chatApi.getMyRooms();
-      const filtered = res.data.data.filter((r) => r.lastMessage);
-      setRooms(filtered);
-    };
-
-    load();
-  }, [setRooms]);
 
   ////////////////////////////////////////////////
   // UI

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useChatStore } from "@/stores/chatStore";
 import type { Message } from "@/features/chat/types/chat.types";
 
-export function SocketManager() {
+export function SocketProvider() {
   const token = useAuthStore((s) => s.accessToken);
   const currentUser = useAuthStore((s) => s.user);
 
@@ -26,12 +26,14 @@ export function SocketManager() {
     const handleRoomUpdated = (data: {
       chatRoomId: string;
       lastMessage: Message;
+      lastMessageAt: Date;
       senderId: string;
     }) => {
       useChatStore.getState().updateRoom(
         {
           chatRoomId: data.chatRoomId,
           lastMessage: data.lastMessage,
+          lastMessageAt: data.lastMessageAt,
           senderId: data.senderId,
         },
         currentUser.id,

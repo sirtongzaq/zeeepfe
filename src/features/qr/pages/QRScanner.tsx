@@ -1,6 +1,6 @@
 import { Html5Qrcode, Html5QrcodeScannerState } from "html5-qrcode";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { decodeQR } from "./utils/qr.utils";
+import { decodeQR } from "../utils/qr.utils";
 
 interface Props {
   onSuccess: (userId: string) => void;

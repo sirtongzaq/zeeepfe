@@ -3,6 +3,7 @@ export type ChatRoom = {
   name: string;
   isGroup?: boolean;
   lastMessage?: Message;
+  lastMessageAt?: Date;
   unreadCount?: number;
   otherUser?: Sender | null;
 };
@@ -55,6 +56,7 @@ export type ChatRoomParticipant = {
 export interface RoomUpdatedPayload {
   chatRoomId: string;
   lastMessage: Message;
+  lastMessageAt: Date;
   senderId: string;
 }
 

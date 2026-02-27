@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { decodeToken } from "@/features/auth/jwt";
+import { decodeToken } from "@/shared/lib/jwt";
 
 interface User {
   id: string;

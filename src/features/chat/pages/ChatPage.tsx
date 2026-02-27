@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useOutletContext, useParams } from "react-router-dom";
-import { chatApi } from "@/features/chat/api";
-import type { ChatRoomDetail, Message } from "./types/chat.types";
+import type { ChatRoomDetail, Message } from "../types/chat.types";
 import { useAuthStore } from "@/stores/authStore";
 import { useChatStore } from "@/stores/chatStore";
 import { socket } from "@/shared/lib/socket";
+import React from "react";
+import { chatApi } from "../api/api";
 
 type OutletContextType = {
   setChatDetail: (detail: ChatRoomDetail) => void;
@@ -152,6 +153,20 @@ export default function ChatPage() {
   };
 
   ////////////////////////////////////////////////////////
+  // Logic อื่นๆ
+  ////////////////////////////////////////////////////////
+
+  function shouldShowDateSeparator(current: Date, previous?: Date) {
+    if (!previous) return true;
+
+    return (
+      current.getFullYear() !== previous.getFullYear() ||
+      current.getMonth() !== previous.getMonth() ||
+      current.getDate() !== previous.getDate()
+    );
+  }
+
+  ////////////////////////////////////////////////////////
   // UI
   ////////////////////////////////////////////////////////
 
@@ -172,16 +187,43 @@ export default function ChatPage() {
           <div className="text-center text-xs text-gray-400">กำลังโหลด...</div>
         )}
 
-        {messages.map((msg) => {
+        {messages.map((msg, index) => {
           const isMe = msg.senderId === currentUser?.id;
 
+          const currentDate = new Date(msg.createdAt);
+          const prevDate =
+            index > 0 ? new Date(messages[index - 1].createdAt) : undefined;
+
+          const showDateSeparator = shouldShowDateSeparator(
+            currentDate,
+            prevDate,
+          );
+
           return (
-            <div
-              key={msg.id}
-              className={`chat-bubble ${isMe ? "me" : "other"}`}
-            >
-              {msg.content}
-            </div>
+            <React.Fragment key={msg.id}>
+              {showDateSeparator && (
+                <div className="chat-separator">
+                  {currentDate.toLocaleDateString([], {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </div>
+              )}
+
+              <div className={`chat-row ${isMe ? "me" : "other"}`}>
+                <div className={`chat-bubble ${isMe ? "me" : "other"}`}>
+                  {msg.content}
+                </div>
+
+                <span className="chat-time">
+                  {currentDate.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            </React.Fragment>
           );
         })}
 

@@ -90,7 +90,7 @@
   --info-bg: #172554;
   --info-border: #1e3a8a;
 
-    /* QR */
+  /* QR */
   --qr-border: #f9fafb;
 }
 
@@ -518,6 +518,20 @@ body,
 /*           CHAT UI             */
 /* ============================= */
 
+.chat-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.chat-row.me {
+  align-items: flex-end;
+}
+
+.chat-row.other {
+  align-items: flex-start;
+}
+
 .chat-bubble {
   display: inline-block;
   width: fit-content;
@@ -542,6 +556,24 @@ body,
   background: var(--bubble-other);
   color: var(--text-primary);
   border-bottom-left-radius: 6px;
+}
+
+.chat-time {
+  font-size: 10px;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.chat-separator {
+  align-self: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin: 16px 0;
+  opacity: 0.8;
 }
 
 /* ============================= */
@@ -837,18 +869,6 @@ body,
   }
 }
 
-.qr-card-animated {
-  animation: qrFadeIn 0.6s ease;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.qr-card-animated:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
-}
-
 @keyframes qrFadeIn {
   from {
     opacity: 0;
@@ -874,6 +894,9 @@ body,
 }
 
 .qr-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   background: var(--surface);
   width: 100%;
   max-width: 420px;
@@ -1019,4 +1042,148 @@ body,
   100% {
     opacity: 0.6;
   }
+}
+
+/* ============================= */
+/*          NAV BADGE            */
+/* ============================= */
+
+.nav-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+
+  background: var(--error);
+  color: var(--text-primary);
+
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+
+  border-radius: 999px;
+  border: 2px solid var(--surface);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: badgePop 0.25s ease;
+}
+
+@keyframes badgePop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================= */
+/*          ADD FRIEND           */
+/* ============================= */
+
+.addfriend-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.addfriend-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 28px 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+[data-theme="dark"] .addfriend-card {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.addfriend-title {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Input section */
+.addfriend-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.addfriend-input {
+  flex: 1;
+  padding: 10px 14px;
+}
+
+.addfriend-btn {
+  padding: 0 20px;
+}
+
+/* Divider */
+.addfriend-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.addfriend-divider::before,
+.addfriend-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.addfriend-divider span {
+  padding: 0 10px;
+}
+
+/* My ID */
+.addfriend-myid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-soft);
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+
+.addfriend-myid-text {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.addfriend-copy-btn {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  transition: all 0.2s ease;
+}
+
+.addfriend-copy-btn:hover {
+  background: var(--primary);
+  color: white;
 }

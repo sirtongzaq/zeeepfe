@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
-import { decodeToken } from "@/features/auth/jwt";
+import { decodeToken } from "@/shared/lib/jwt";
 
 export default function ProfilePage() {
   const navigate = useNavigate();

@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
-import AppLayout from "./AppLayout";
-import PrivateLayout from "./PrivateLayout";
-import SignInPage from "@/features/auth/SignInPage";
-import ChatPage from "@/features/chat/ChatPage";
-import ChatListPage from "@/features/chat/ChatListPage";
-import QRPage from "@/features/qr/QRPage";
-import OtpPage from "@/features/auth/OtpPage";
+import AppLayout from "../layouts/AppLayout";
+import PrivateLayout from "../layouts/PrivateLayout";
+import SignInPage from "@/features/auth/pages/SignInPage";
+import ChatPage from "@/features/chat/pages/ChatPage";
+import ChatListPage from "@/features/chat/pages/ChatListPage";
+import QRPage from "@/features/qr/pages/QRPage";
+import OtpPage from "@/features/auth/pages/OtpPage";
 import ProfilePage from "@/features/profile/ProfilePage";
 
 export const router = createBrowserRouter([
