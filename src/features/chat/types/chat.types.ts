@@ -26,7 +26,7 @@ export type Message = {
 export type Sender = {
   id: string;
   email?: string;
-  nickname: string;
+  username: string;
   bio: string;
   avatarUrl: string;
   isVerified?: boolean;

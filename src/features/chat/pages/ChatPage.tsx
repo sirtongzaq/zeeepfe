@@ -28,6 +28,11 @@ export default function ChatPage() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const [shouldScrollAfterSend, setShouldScrollAfterSend] = useState(false);
+
   ////////////////////////////////////////////////////////
   // โหลดรอบแรก
   ////////////////////////////////////////////////////////
@@ -54,8 +59,8 @@ export default function ChatPage() {
 
       // scroll ลงล่างสุดตอนโหลดครั้งแรก
       setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "auto" });
-      }, 0);
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } catch (err) {
       console.error("❌ load chat failed", err);
     }
@@ -115,18 +120,20 @@ export default function ChatPage() {
     const handleNewMessage = (message: Message) => {
       if (message.chatRoomId !== chatRoomId) return;
 
-      const scrollContainer = containerRef.current;
-      const isAtBottom =
-        scrollContainer &&
-        scrollContainer.scrollHeight - scrollContainer.scrollTop <=
-          scrollContainer.clientHeight + 100;
+      const isMe = message.senderId === currentUser?.id;
 
       setMessages((prev) => [...prev, message]);
 
       if (isAtBottom) {
+        // อยู่ล่างสุด → auto scroll
         setTimeout(() => {
           bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 0);
+        }, 100);
+      } else {
+        // เพิ่ม unread เฉพาะข้อความจากคนอื่น
+        if (!isMe) {
+          setUnreadCount((prev) => prev + 1);
+        }
       }
     };
 
@@ -135,7 +142,7 @@ export default function ChatPage() {
     return () => {
       socket.off("new_message", handleNewMessage);
     };
-  }, [chatRoomId]);
+  }, [chatRoomId, currentUser?.id, isAtBottom]);
 
   ////////////////////////////////////////////////////////
   // ส่งข้อความ
@@ -149,8 +156,19 @@ export default function ChatPage() {
       content: input.trim(),
     });
 
+    setShouldScrollAfterSend(true);
+
     setInput("");
   };
+
+  useEffect(() => {
+    if (!shouldScrollAfterSend) return;
+
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    setShouldScrollAfterSend(false);
+  }, [messages, shouldScrollAfterSend]);
 
   ////////////////////////////////////////////////////////
   // Logic อื่นๆ
@@ -171,13 +189,23 @@ export default function ChatPage() {
   ////////////////////////////////////////////////////////
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {/* Message Area */}
       <div
         ref={containerRef}
         className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-2"
         onScroll={(e) => {
           const target = e.currentTarget;
+
+          const atBottom =
+            target.scrollHeight - target.scrollTop <= target.clientHeight + 80;
+
+          setIsAtBottom(atBottom);
+
+          if (atBottom) {
+            setUnreadCount(0);
+          }
+
           if (target.scrollTop === 0) {
             loadMoreMessages();
           }
@@ -229,6 +257,20 @@ export default function ChatPage() {
 
         <div ref={bottomRef} />
       </div>
+
+      {!isAtBottom && unreadCount > 0 && (
+        <div className="chat-new-message-popup">
+          <button
+            onClick={() => {
+              bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+              setUnreadCount(0);
+            }}
+            className="chat-new-message-btn"
+          >
+            ข้อความใหม่ {unreadCount} ข้อความ ↓
+          </button>
+        </div>
+      )}
 
       {/* Input Bar */}
       <div className="chat-input-bar">

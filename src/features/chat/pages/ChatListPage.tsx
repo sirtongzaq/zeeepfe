@@ -21,7 +21,17 @@ export default function ChatListPage() {
     <div className="flex-1 overflow-y-auto chat-list-container">
       {rooms.map((room) => (
         <Link key={room.id} to={`/chat/${room.id}`} className="chat-list-item">
-          <div className="chat-avatar">{loadName(room, true)}</div>
+          <div className="chat-avatar">
+            {room.otherUser?.avatarUrl ? (
+              <img
+                src={room.otherUser.avatarUrl}
+                alt={loadName(room)}
+                className="chat-avatar-img"
+              />
+            ) : (
+              loadName(room, true)
+            )}
+          </div>
 
           <div className="chat-info">
             <div className="chat-name">{loadName(room)}</div>
