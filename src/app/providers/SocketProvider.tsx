@@ -37,6 +37,7 @@ export function SocketProvider() {
           senderId: data.senderId,
         },
         currentUser.id,
+        useChatStore.getState().activeRoomId === data.chatRoomId,
       );
     };
 

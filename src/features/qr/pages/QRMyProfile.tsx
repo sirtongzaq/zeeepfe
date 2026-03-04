@@ -24,10 +24,6 @@ export default function QRMyProfile({ userId, name }: Props) {
     link.click();
   };
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(userId);
-  };
-
   return (
     <div className="qr-my-container">
       <div ref={qrRef} className="qr-card">
@@ -42,22 +38,14 @@ export default function QRMyProfile({ userId, name }: Props) {
 
         {/* Divider */}
         <div className="addfriend-divider">
-          <span>My ID</span>
+          <span>Download QR Code</span>
         </div>
 
         {/* My ID Section */}
-        <div className="addfriend-myid">
-          <span className="addfriend-myid-text">@{userId}</span>
-
-          <button className="addfriend-copy-btn" onClick={handleCopy}>
-            Copy
-          </button>
-        </div>
+        <button onClick={handleDownload} className="btn btn-primary">
+          ดาวน์โหลด QR
+        </button>
       </div>
-
-      <button onClick={handleDownload} className="btn-primary qr-download-btn">
-        ดาวน์โหลด QR
-      </button>
     </div>
   );
 }

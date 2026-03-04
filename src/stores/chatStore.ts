@@ -7,15 +7,24 @@ import type {
 interface ChatState {
   rooms: ChatRoom[];
   totalUnread: number;
+  activeRoomId: string | null;
 
   setRooms: (rooms: ChatRoom[]) => void;
-  updateRoom: (payload: RoomUpdatedPayload, myUserId: string) => void;
+  updateRoom: (
+    payload: RoomUpdatedPayload,
+    myUserId: string,
+    isActiveRoom?: boolean,
+  ) => void;
   resetRoomUnread: (roomId: string) => void;
+  setActiveRoom: (roomId: string | null) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
   rooms: [],
   totalUnread: 0,
+  activeRoomId: null,
+
+  setActiveRoom: (roomId) => set({ activeRoomId: roomId }),
 
   setRooms: (rooms) =>
     set({
@@ -23,7 +32,7 @@ export const useChatStore = create<ChatState>((set) => ({
       totalUnread: rooms.reduce((sum, r) => sum + (r.unreadCount ?? 0), 0),
     }),
 
-  updateRoom: (data, myUserId) =>
+  updateRoom: (data, myUserId, isActiveRoom = false) =>
     set((state) => {
       const updated = state.rooms.map((room) =>
         room.id === data.chatRoomId
@@ -32,8 +41,8 @@ export const useChatStore = create<ChatState>((set) => ({
               lastMessage: data.lastMessage,
               lastMessageAt: data.lastMessageAt,
               unreadCount:
-                data.senderId === myUserId
-                  ? (room.unreadCount ?? 0)
+                data.senderId === myUserId || isActiveRoom
+                  ? 0
                   : (room.unreadCount ?? 0) + 1,
             }
           : room,

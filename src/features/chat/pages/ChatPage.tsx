@@ -118,23 +118,29 @@ export default function ChatPage() {
     if (!chatRoomId) return;
 
     const handleNewMessage = (message: Message) => {
+      // ❌ ไม่ใช่ room ปัจจุบัน → ignore
       if (message.chatRoomId !== chatRoomId) return;
 
       const isMe = message.senderId === currentUser?.id;
 
+      // ✅ เพิ่ม message เข้า state
       setMessages((prev) => [...prev, message]);
 
+      // ✅ ถ้าเป็นข้อความเรา → จบเลย
+      if (isMe) return;
+
+      // ✅ อยู่ล่างสุด → auto scroll + mark read
       if (isAtBottom) {
-        // อยู่ล่างสุด → auto scroll
         setTimeout(() => {
           bottomRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
-      } else {
-        // เพิ่ม unread เฉพาะข้อความจากคนอื่น
-        if (!isMe) {
-          setUnreadCount((prev) => prev + 1);
-        }
+
+        socket.emit("mark_read", { chatRoomId });
+        return;
       }
+
+      // ✅ ไม่ได้อยู่ล่างสุด → เพิ่ม unread
+      setUnreadCount((prev) => prev + 1);
     };
 
     socket.on("new_message", handleNewMessage);
@@ -169,6 +175,16 @@ export default function ChatPage() {
     }, 100);
     setShouldScrollAfterSend(false);
   }, [messages, shouldScrollAfterSend]);
+
+  useEffect(() => {
+    if (chatRoomId) {
+      useChatStore.getState().setActiveRoom(chatRoomId);
+    }
+
+    return () => {
+      useChatStore.getState().setActiveRoom(null);
+    };
+  }, [chatRoomId]);
 
   ////////////////////////////////////////////////////////
   // Logic อื่นๆ

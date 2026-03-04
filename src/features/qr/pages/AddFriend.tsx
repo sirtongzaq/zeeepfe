@@ -24,16 +24,16 @@ export default function AddFriend({ userId, onAddFriend }: Props) {
         <h2 className="addfriend-title">Add Friend</h2>
 
         {/* Input Section */}
-        <div className="addfriend-input-group">
+        <div className="addfriend-input-group text-sm">
           <input
             type="text"
-            placeholder="Enter friend userId"
+            placeholder="Enter user ID to add (e.g. @abc123...xyz789)"
             value={friendId}
             onChange={(e) => setFriendId(e.target.value)}
-            className="input-clean addfriend-input"
+            className="input-clean addfriend-input text-sm"
           />
 
-          <button onClick={handleSubmit} className="btn-primary addfriend-btn">
+          <button onClick={handleSubmit} className="btn btn-primary">
             Add
           </button>
         </div>
@@ -45,7 +45,9 @@ export default function AddFriend({ userId, onAddFriend }: Props) {
 
         {/* My ID Section */}
         <div className="addfriend-myid">
-          <span className="addfriend-myid-text">@{userId}</span>
+          <span className="addfriend-myid-text font-mono text-primary text-sm break-all">
+            @{userId.slice(0, 8)}...{userId.slice(-8)}
+          </span>
 
           <button className="addfriend-copy-btn" onClick={handleCopy}>
             Copy

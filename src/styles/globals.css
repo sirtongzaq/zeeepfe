@@ -121,6 +121,9 @@
 .text-muted {
   color: var(--text-muted);
 }
+.text-warning {
+  color: var(--warning);
+}
 
 /* ============================= */
 /*         BASE TYPOGRAPHY       */
@@ -454,7 +457,7 @@ body,
 }
 
 /* 🔥 iPad ขึ้นไปให้เต็มจอ */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (max-width: 1024px) {
   .app-shell {
     background: var(--surface);
   }
@@ -872,6 +875,15 @@ body,
   color: white;
   font-size: 11px;
   padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.chat-read {
+  margin-top: 4px;
+  color: var(--primary);
+  font-size: 11px;
+  padding: 2px;
   border-radius: 999px;
   display: inline-block;
 }
@@ -1473,4 +1485,21 @@ body,
   background: var(--surface);
   color: var(--text-primary);
   border-color: var(--border);
+}
+
+.profile-action-bar {
+  position: fixed;
+  bottom: 4rem;
+  right: 30rem;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 50;
+}
+
+@media (max-width: 1024px) {
+  .profile-action-bar {
+    right: 0rem;
+  }
 }

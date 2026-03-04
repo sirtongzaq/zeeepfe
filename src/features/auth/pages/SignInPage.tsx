@@ -24,7 +24,7 @@ export default function SignInPage() {
           placeholder="Email"
           className="w-full h-12 px-4 rounded-2xl input-clean"
         />
-        <button className="w-full h-12 rounded-2xl btn-primary">
+        <button className="w-full h-12 btn btn-primary">
           Continue
         </button>
       </form>

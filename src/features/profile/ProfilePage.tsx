@@ -152,23 +152,82 @@ export default function ProfilePage() {
             )}
           </div>
 
-          <div className="text-center">
-            <div className="relative inline-block">
-              <h2 className="text-primary font-semibold">
-                @{profile.username || profile.email.split("@")[0]}
-              </h2>
+          <div className="relative inline-block">
+            {isEditing ? (
+              <div className="relative w-full max-w-xs mx-auto">
+                <input
+                  type="text"
+                  maxLength={50}
+                  value={form.username}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, username: e.target.value }))
+                  }
+                  placeholder="@Username"
+                  className="rounded-2xl text-primary input-clean w-full text-center"
+                />
 
-              {!profile.username && (
-                <span className="badge badge-sm badge-warning">Incomplete</span>
-              )}
-            </div>
+                <div
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 text-xs pointer-events-none transition ${
+                    form.username.length > 40
+                      ? "text-warning"
+                      : "text-muted opacity-60"
+                  }`}
+                >
+                  {form.username.length}/50
+                </div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-primary font-semibold">
+                  @{profile.username || profile.email.split("@")[0]}
+                </h2>
+
+                {!profile.username && (
+                  <span className="badge badge-sm badge-warning">
+                    Incomplete
+                  </span>
+                )}
+              </>
+            )}
           </div>
         </div>
 
         {/* Bio Card */}
         <div className="bg-soft rounded-2xl p-4 space-y-2">
-          <p className="text-sm text-muted">Bio</p>
-          <p className="text-primary">{profile.bio || "No bio yet."}</p>
+          {isEditing ? (
+            <>
+              <p className="text-sm text-muted">Bio</p>
+
+              <div className="relative">
+                <textarea
+                  maxLength={255}
+                  value={form.bio}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, bio: e.target.value }))
+                  }
+                  placeholder="Tell us about yourself..."
+                  className="w-full h-48 p-4 pb-8 rounded-lg input-clean resize-none"
+                />
+
+                <span
+                  className={`absolute bottom-3 right-4 text-xs transition pointer-events-none ${
+                    form.bio.length > 240
+                      ? "text-warning"
+                      : "text-muted opacity-60"
+                  }`}
+                >
+                  {form?.bio?.length ?? 0}/255
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted">Bio</p>
+              <p className="text-primary whitespace-pre-line">
+                {profile.bio || "No bio yet."}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Account Info */}
@@ -190,10 +249,12 @@ export default function ProfilePage() {
             <span className="badge badge-md badge-success">Verified</span>
           </div>
         </div>
+      </div>
 
-        {/* Action Buttons */}
+      {/* Floating Action Bottom */}
+      <div className="profile-action-bar">
         {isEditing ? (
-          <div className="space-y-4 pt-4">
+          <>
             <button
               className={`w-full h-12 btn btn-primary ${
                 isSaving ? "btn-loading" : ""
@@ -211,9 +272,9 @@ export default function ProfilePage() {
             >
               Cancel
             </button>
-          </div>
+          </>
         ) : (
-          <div className="space-y-4 pt-4">
+          <>
             <button className="w-full h-12 btn btn-primary">
               Share Profile
             </button>
@@ -221,7 +282,7 @@ export default function ProfilePage() {
             <button className="w-full btn btn-outline" onClick={handleEdit}>
               Edit Profile
             </button>
-          </div>
+          </>
         )}
       </div>
     </div>

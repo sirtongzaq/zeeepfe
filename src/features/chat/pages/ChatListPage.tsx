@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useChatStore } from "@/stores/chatStore";
 import { loadName } from "../utils/chat.utils";
+import { Check } from "lucide-react";
 
 export default function ChatListPage() {
   const rooms = useChatStore((s) => s.rooms);
@@ -48,8 +49,12 @@ export default function ChatListPage() {
                 : ""}
             </div>
 
-            {room.unreadCount && room.unreadCount > 0 && (
+            {room.unreadCount && room.unreadCount > 0 ? (
               <div className="chat-unread">{room.unreadCount}</div>
+            ) : (
+              <div className="chat-read">
+                <Check size={16} className="text-success" />
+              </div>
             )}
           </div>
         </Link>
