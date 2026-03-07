@@ -23,3 +23,11 @@ export interface UserProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface SearchUser {
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl?: string;
+  bio?: string;
+}

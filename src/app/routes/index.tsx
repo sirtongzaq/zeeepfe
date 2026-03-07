@@ -7,6 +7,7 @@ import ChatListPage from "@/features/chat/pages/ChatListPage";
 import QRPage from "@/features/qr/pages/QRPage";
 import OtpPage from "@/features/auth/pages/OtpPage";
 import ProfilePage from "@/features/profile/ProfilePage";
+import ViewProfilePage from "@/features/profile/ViewProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
           { path: "chat/:chatRoomId", element: <ChatPage /> },
           { path: "qr", element: <QRPage /> },
           { path: "/profile", element: <ProfilePage /> },
+          { path: "profile/:userId", element: <ViewProfilePage /> },
         ],
       },
     ],

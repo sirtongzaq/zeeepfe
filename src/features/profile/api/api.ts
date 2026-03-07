@@ -16,9 +16,15 @@ export const profileApi = {
 
   // 🌍 ดูโปรไฟล์ public
   getPublicProfile: (userId: string) =>
-    api.get<ApiResponse<UserProfile>>(`/users/${userId}`),
+    api.get<ApiResponse<UserProfile>>(`/users/profile/${userId}`),
 
   // 👤 update profile (รวม avatarUrl)
   updateProfile: (payload: UpdateProfilePayload) =>
     api.patch<ApiResponse<never>>("/users", payload),
+
+  // 🔍 Search Users
+  searchUsers: (query: string, page = 1, limit = 20) =>
+    api.get(`/users/search`, {
+      params: { q: query, page, limit },
+    }),
 };

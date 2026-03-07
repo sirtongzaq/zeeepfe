@@ -102,6 +102,40 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col h-full bg-app">
+      {/* Floating Action Bottom */}
+      <div className="profile-action-bar">
+        {isEditing ? (
+          <>
+            <button
+              className={`w-full h-12 btn btn-primary ${
+                isSaving ? "btn-loading" : ""
+              }`}
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? "" : "Save Changes"}
+            </button>
+
+            <button
+              className="w-full btn btn-ghost"
+              onClick={() => setIsEditing(false)}
+              disabled={isSaving}
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <>
+            <button className="w-full h-12 btn btn-primary">
+              Share Profile
+            </button>
+
+            <button className="w-full btn btn-outline" onClick={handleEdit}>
+              Edit Profile
+            </button>
+          </>
+        )}
+      </div>
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Avatar Section */}
         <div className="flex flex-col items-center gap-4">
@@ -249,41 +283,6 @@ export default function ProfilePage() {
             <span className="badge badge-md badge-success">Verified</span>
           </div>
         </div>
-      </div>
-
-      {/* Floating Action Bottom */}
-      <div className="profile-action-bar">
-        {isEditing ? (
-          <>
-            <button
-              className={`w-full h-12 btn btn-primary ${
-                isSaving ? "btn-loading" : ""
-              }`}
-              onClick={handleSave}
-              disabled={isSaving}
-            >
-              {isSaving ? "" : "Save Changes"}
-            </button>
-
-            <button
-              className="w-full btn btn-ghost"
-              onClick={() => setIsEditing(false)}
-              disabled={isSaving}
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <>
-            <button className="w-full h-12 btn btn-primary">
-              Share Profile
-            </button>
-
-            <button className="w-full btn btn-outline" onClick={handleEdit}>
-              Edit Profile
-            </button>
-          </>
-        )}
       </div>
     </div>
   );

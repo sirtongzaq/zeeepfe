@@ -4,7 +4,7 @@ import QRScanner from "./QRScanner";
 import { useAuthStore } from "@/stores/authStore";
 import { chatApi } from "@/features/chat/api/api";
 import QRMyProfile from "./QRMyProfile";
-import AddFriend from "./AddFriend";
+import SearchUser from "./SearchUser";
 export default function QRPage() {
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"addfriend" | "myqr" | "scan">(
@@ -71,8 +71,8 @@ export default function QRPage() {
 
       <div className="qr-content">
         {activeTab === "addfriend" && (
-          <div className="qr-my-wrapper">
-            <AddFriend userId={currentUser!.id} onAddFriend={setChatUserId} />
+          <div className="qr-add-wrapper">
+            <SearchUser />
           </div>
         )}
 
