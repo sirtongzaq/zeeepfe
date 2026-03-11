@@ -6,6 +6,7 @@ import { useChatStore } from "@/stores/chatStore";
 import { socket } from "@/shared/lib/socket";
 import React from "react";
 import { chatApi } from "../api/api";
+import { ChatEvents } from "../constants/chatEvents";
 
 type OutletContextType = {
   setChatDetail: (detail: ChatRoomDetail) => void;
@@ -25,17 +26,17 @@ export default function ChatPage() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const [shouldScrollAfterSend, setShouldScrollAfterSend] = useState(false);
-
-  ////////////////////////////////////////////////////////
-  // โหลดรอบแรก
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+  // LOAD INITIAL
+  //////////////////////////////////////////////////////
 
   const loadInitialMessages = useCallback(async () => {
     if (!chatRoomId) return;
@@ -49,18 +50,19 @@ export default function ChatPage() {
       const { messages, nextCursor, hasMore } = resMessages.data.data;
       const detail = resRoomDetail.data.data;
 
-      setMessages(messages.reverse()); // เก่า → ใหม่
+      setMessages(messages.reverse());
       setCursor(nextCursor);
       setHasMore(hasMore);
+
       setChatDetail(detail);
 
-      socket.emit("join_room", { chatRoomId });
+      socket.emit(ChatEvents.JOIN_ROOM, { chatRoomId });
+
       resetRoomUnread(chatRoomId);
 
-      // scroll ลงล่างสุดตอนโหลดครั้งแรก
       setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+        bottomRef.current?.scrollIntoView();
+      }, 50);
     } catch (err) {
       console.error("❌ load chat failed", err);
     }
@@ -68,17 +70,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     loadInitialMessages();
+  }, [loadInitialMessages]);
 
-    return () => {
-      if (chatRoomId) {
-        socket.emit("leave_room", { chatRoomId });
-      }
-    };
-  }, [chatRoomId, loadInitialMessages]);
-
-  ////////////////////////////////////////////////////////
-  // โหลดข้อความเก่า (Cursor Pagination)
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+  // LOAD MORE (CURSOR PAGINATION)
+  //////////////////////////////////////////////////////
 
   const loadMoreMessages = async () => {
     if (!chatRoomId || !cursor || !hasMore || loadingMore) return;
@@ -86,22 +82,23 @@ export default function ChatPage() {
     try {
       setLoadingMore(true);
 
-      const scrollContainer = containerRef.current;
-      const previousHeight = scrollContainer?.scrollHeight ?? 0;
+      const container = containerRef.current;
+      const previousHeight = container?.scrollHeight ?? 0;
 
       const res = await chatApi.getMessages(chatRoomId, cursor);
-      const { messages: olderMessages, nextCursor, hasMore } = res.data.data;
 
-      setMessages((prev) => [...olderMessages.reverse(), ...prev]);
+      const { messages: older, nextCursor, hasMore } = res.data.data;
+
+      setMessages((prev) => [...older.reverse(), ...prev]);
 
       setCursor(nextCursor);
       setHasMore(hasMore);
 
-      // 🔥 รักษาตำแหน่ง scroll
       setTimeout(() => {
-        if (!scrollContainer) return;
-        const newHeight = scrollContainer.scrollHeight;
-        scrollContainer.scrollTop = newHeight - previousHeight;
+        if (!container) return;
+
+        const newHeight = container.scrollHeight;
+        container.scrollTop = newHeight - previousHeight;
       }, 0);
     } catch (err) {
       console.error("❌ load more failed", err);
@@ -110,71 +107,172 @@ export default function ChatPage() {
     }
   };
 
-  ////////////////////////////////////////////////////////
-  // Realtime
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+  // REALTIME MESSAGE
+  //////////////////////////////////////////////////////
 
   useEffect(() => {
     if (!chatRoomId) return;
 
     const handleNewMessage = (message: Message) => {
-      // ❌ ไม่ใช่ room ปัจจุบัน → ignore
       if (message.chatRoomId !== chatRoomId) return;
 
       const isMe = message.senderId === currentUser?.id;
 
-      // ✅ เพิ่ม message เข้า state
-      setMessages((prev) => [...prev, message]);
+      console.log("message.senderId", message.senderId);
+      console.log("currentUser.id", currentUser?.id);
 
-      // ✅ ถ้าเป็นข้อความเรา → จบเลย
+      setMessages((prev) => {
+        // ถ้ามี id เดียวกันอยู่แล้ว
+        const exists = prev.some((m) => m.id === message.id);
+        if (exists) return prev;
+
+        // หา optimistic message ของตัวเอง
+        const optimisticIndex = prev.findIndex(
+          (m) =>
+            m.senderId === message.senderId &&
+            m.content === message.content &&
+            m.id.startsWith("temp-"),
+        );
+
+        if (optimisticIndex !== -1) {
+          const updated = [...prev];
+          updated[optimisticIndex] = message;
+          return updated;
+        }
+
+        return [...prev, message];
+      });
       if (isMe) return;
 
-      // ✅ อยู่ล่างสุด → auto scroll + mark read
       if (isAtBottom) {
         setTimeout(() => {
-          bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+          bottomRef.current?.scrollIntoView();
+        }, 50);
 
-        socket.emit("mark_read", { chatRoomId });
+        socket.emit(ChatEvents.MARK_READ, { chatRoomId });
         return;
       }
 
-      // ✅ ไม่ได้อยู่ล่างสุด → เพิ่ม unread
       setUnreadCount((prev) => prev + 1);
     };
 
-    socket.on("new_message", handleNewMessage);
+    socket.on(ChatEvents.MESSAGE_RECEIVED, handleNewMessage);
 
     return () => {
-      socket.off("new_message", handleNewMessage);
+      socket.off(ChatEvents.MESSAGE_RECEIVED, handleNewMessage);
     };
   }, [chatRoomId, currentUser?.id, isAtBottom]);
 
-  ////////////////////////////////////////////////////////
-  // ส่งข้อความ
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+  // MESSAGE READ
+  //////////////////////////////////////////////////////
+
+  useEffect(() => {
+    if (!chatRoomId) return;
+
+    const handleRead = (data: { chatRoomId: string; userId: string }) => {
+      if (data.chatRoomId !== chatRoomId) return;
+
+      if (data.userId === currentUser?.id) return;
+
+      console.log("messages read by", data.userId);
+    };
+
+    socket.on(ChatEvents.MESSAGE_READ, handleRead);
+
+    return () => {
+      socket.off(ChatEvents.MESSAGE_READ, handleRead);
+    };
+  }, [chatRoomId, currentUser?.id]);
+
+  //////////////////////////////////////////////////////
+  // TYPING
+  //////////////////////////////////////////////////////
+
+  useEffect(() => {
+    if (!chatRoomId) return;
+
+    const handleTyping = (data: {
+      chatRoomId: string;
+      userId: string;
+      isTyping: boolean;
+    }) => {
+      if (data.chatRoomId !== chatRoomId) return;
+
+      setTypingUsers((prev) => {
+        if (data.isTyping) {
+          if (prev.includes(data.userId)) return prev;
+          return [...prev, data.userId];
+        }
+
+        return prev.filter((id) => id !== data.userId);
+      });
+    };
+
+    socket.on(ChatEvents.TYPING, handleTyping);
+
+    return () => {
+      socket.off(ChatEvents.TYPING, handleTyping);
+    };
+  }, [chatRoomId]);
+
+  //////////////////////////////////////////////////////
+  // SEND MESSAGE (OPTIMISTIC)
+  //////////////////////////////////////////////////////
 
   const handleSend = () => {
-    if (!input.trim() || !chatRoomId) return;
+    if (!input.trim() || !chatRoomId || !currentUser) return;
 
-    socket.emit("send_message", {
+    const tempId = "temp-" + crypto.randomUUID();
+
+    const optimistic: Message = {
+      id: tempId,
+      chatRoomId,
+      senderId: currentUser.id,
+      content: input.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, optimistic]);
+
+    socket.emit(ChatEvents.SEND_MESSAGE, {
       chatRoomId,
       content: input.trim(),
     });
 
-    setShouldScrollAfterSend(true);
-
     setInput("");
-  };
-
-  useEffect(() => {
-    if (!shouldScrollAfterSend) return;
 
     setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-    setShouldScrollAfterSend(false);
-  }, [messages, shouldScrollAfterSend]);
+      bottomRef.current?.scrollIntoView();
+    }, 50);
+  };
+
+  //////////////////////////////////////////////////////
+  // TYPING EMIT
+  //////////////////////////////////////////////////////
+
+  useEffect(() => {
+    if (!chatRoomId) return;
+
+    socket.emit(ChatEvents.TYPING, {
+      chatRoomId,
+      isTyping: true,
+    });
+
+    const timeout = setTimeout(() => {
+      socket.emit(ChatEvents.TYPING, {
+        chatRoomId,
+        isTyping: false,
+      });
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [input, chatRoomId]);
+
+  //////////////////////////////////////////////////////
+  // ACTIVE ROOM
+  //////////////////////////////////////////////////////
 
   useEffect(() => {
     if (chatRoomId) {
@@ -186,9 +284,9 @@ export default function ChatPage() {
     };
   }, [chatRoomId]);
 
-  ////////////////////////////////////////////////////////
-  // Logic อื่นๆ
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+  // DATE SEPARATOR
+  //////////////////////////////////////////////////////
 
   function shouldShowDateSeparator(current: Date, previous?: Date) {
     if (!previous) return true;
@@ -200,16 +298,15 @@ export default function ChatPage() {
     );
   }
 
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
   // UI
-  ////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
 
   return (
     <div className="flex flex-col h-full relative">
-      {/* Message Area */}
       <div
         ref={containerRef}
-        className="flex-1 min-h-0 overflow-y-auto p-4 flex flex-col gap-2"
+        className="flex-1 overflow-y-auto p-4 flex flex-col gap-2"
         onScroll={(e) => {
           const target = e.currentTarget;
 
@@ -247,11 +344,7 @@ export default function ChatPage() {
             <React.Fragment key={msg.id}>
               {showDateSeparator && (
                 <div className="chat-separator">
-                  {currentDate.toLocaleDateString([], {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {currentDate.toLocaleDateString()}
                 </div>
               )}
 
@@ -271,6 +364,10 @@ export default function ChatPage() {
           );
         })}
 
+        {typingUsers.length > 0 && (
+          <div className="text-xs text-gray-400 px-2">กำลังพิมพ์...</div>
+        )}
+
         <div ref={bottomRef} />
       </div>
 
@@ -278,17 +375,16 @@ export default function ChatPage() {
         <div className="chat-new-message-popup">
           <button
             onClick={() => {
-              bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+              bottomRef.current?.scrollIntoView();
               setUnreadCount(0);
             }}
             className="chat-new-message-btn"
           >
-            ข้อความใหม่ {unreadCount} ข้อความ ↓
+            ข้อความใหม่ {unreadCount} ↓
           </button>
         </div>
       )}
 
-      {/* Input Bar */}
       <div className="chat-input-bar">
         <div className="chat-input-wrapper">
           <input
@@ -299,6 +395,7 @@ export default function ChatPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
+
           <button
             onClick={handleSend}
             disabled={!input.trim()}

@@ -2,7 +2,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { socket } from "@/shared/lib/socket";
 import { useEffect } from "react";
 import { useChatStore } from "@/stores/chatStore";
-import type { Message } from "@/features/chat/types/chat.types";
+import type { ChatRoom, Message } from "@/features/chat/types/chat.types";
 
 export function SocketProvider() {
   const token = useAuthStore((s) => s.accessToken);
@@ -21,8 +21,9 @@ export function SocketProvider() {
     }
 
     //////////////////////////////////////////////////////
-    // 🔥 Sidebar update only
+    // room_updated
     //////////////////////////////////////////////////////
+
     const handleRoomUpdated = (data: {
       chatRoomId: string;
       lastMessage: Message;
@@ -41,10 +42,25 @@ export function SocketProvider() {
       );
     };
 
+    //////////////////////////////////////////////////////
+    // room_created
+    //////////////////////////////////////////////////////
+
+    const handleRoomCreated = (room: ChatRoom) => {
+      const rooms = useChatStore.getState().rooms;
+
+      const exists = rooms.find((r) => r.id === room.id);
+      if (exists) return;
+
+      useChatStore.getState().addRoom(room);
+    };
+
     socket.on("room_updated", handleRoomUpdated);
+    socket.on("room_created", handleRoomCreated);
 
     return () => {
       socket.off("room_updated", handleRoomUpdated);
+      socket.off("room_created", handleRoomCreated);
     };
   }, [token, currentUser]);
 

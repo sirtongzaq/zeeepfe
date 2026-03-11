@@ -26,9 +26,9 @@ export type Message = {
 export type Sender = {
   id: string;
   email?: string;
-  username: string;
-  bio: string;
-  avatarUrl: string;
+  username?: string;
+  bio?: string;
+  avatarUrl?: string;
   isVerified?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -54,10 +54,15 @@ export type ChatRoomParticipant = {
 };
 
 export interface RoomUpdatedPayload {
-  chatRoomId: string;
-  lastMessage: Message;
-  lastMessageAt: Date;
-  senderId: string;
+  chatRoomId: string
+  senderId: string
+
+  lastMessage: Message
+  lastMessageAt: Date
+
+  isGroup?: boolean
+  name?: string | null
+  otherUser?: Sender  | null
 }
 
 export interface RoomReadPayload {

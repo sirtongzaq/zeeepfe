@@ -8,7 +8,7 @@ import SearchUser from "./SearchUser";
 export default function QRPage() {
   const [chatUserId, setChatUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"addfriend" | "myqr" | "scan">(
-    "addfriend",
+    "myqr",
   );
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();

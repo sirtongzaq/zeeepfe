@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/stores/authStore";
+import { useChatStore } from "@/stores/chatStore";
 import { LogOutIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +10,7 @@ export default function LogOutBtn() {
   const handleLogout = () => {
     logout();
     sessionStorage.removeItem("otp_email");
+    useChatStore.getState().clearRooms();
     navigate("/signin", { replace: true });
   };
 

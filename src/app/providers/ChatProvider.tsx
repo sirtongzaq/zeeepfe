@@ -1,11 +1,15 @@
 import { useEffect } from "react";
 import { useChatStore } from "@/stores/chatStore";
 import { chatApi } from "@/features/chat/api/api";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function ChatProvider() {
   const setRooms = useChatStore((s) => s.setRooms);
+  const userId = useAuthStore((s) => s.user?.id);
 
   useEffect(() => {
+    if (!userId) return;
+
     const load = async () => {
       const res = await chatApi.getMyRooms();
       const rooms = res.data.data;
@@ -23,11 +27,18 @@ export default function ChatProvider() {
         return bTime - aTime;
       });
 
-      setRooms(mapped);
+      const currentRooms = useChatStore.getState().rooms;
+
+      const merged = [
+        ...mapped,
+        ...currentRooms.filter((r) => !mapped.find((m) => m.id === r.id)),
+      ];
+
+      setRooms(merged);
     };
 
     load();
-  }, [setRooms]);
+  }, [setRooms, userId]);
 
   return null;
 }
